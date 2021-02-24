@@ -9,7 +9,7 @@ Parse the output of iw scan to get the name, address, quality, channel, and encr
 Usage
 -----
 
-```bash
+bash
 iw <INTERFACE_NAME> scan | ./iw_parse
 ```
 
