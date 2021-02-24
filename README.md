@@ -40,7 +40,7 @@ Acknowledgements
 ----------------
 
 * The vast majority of iw_parse was written by Hugo Chargois.
-* It was then updated to run with iw command by Kevin
+* It was then forked to run with iw command by Kevin Perez.
 
 License
 -------
