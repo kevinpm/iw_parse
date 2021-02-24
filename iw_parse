@@ -11,12 +11,12 @@ def main():
     # You can choose which columns to display here, and most importantly
     # in what order. Of course, they must exist as keys in the dict rules.
     columns = [
-        "Name",
-        "Address",
-        "Quality",
+        "SSID",
+        "BSSID",
+        # "Quality",
         "Channel",
-        "Signal Level",
-        "Encryption"
+        # "Signal Level",
+        # "Encryption"
     ]
 
     print_cells(parsed_cells, columns)

@@ -16,188 +16,181 @@ def get_name(cell):
     """ Gets the name / essid of a network / cell.
     @param string cell
         A network / cell from iwlist scan.
-
     @return string
         The name / essid of the network.
     """
 
-    essid = matching_line(cell, "ESSID:")
+    essid = matching_line(cell, "SSID: ")
     if not essid:
         return ""
-    return essid[1:-1]
+    return essid
 
-def get_quality(cell):
-    """ Gets the quality of a network / cell.
-    @param string cell
-        A network / cell from iwlist scan.
+# def get_quality(cell):
+#     """ Gets the quality of a network / cell.
+#     @param string cell
+#         A network / cell from iwlist scan.
+#     @return string
+#         The quality of the network.
+#     """
 
-    @return string
-        The quality of the network.
-    """
+#     quality = matching_line(cell, "Quality=")
+#     if quality is None:
+#         return ""
+#     quality = quality.split()[0].split("/")
+#     quality = matching_line(cell, "Quality=").split()[0].split("/")
+#     return str(int(round(float(quality[0]) / float(quality[1]) * 100)))
 
-    quality = matching_line(cell, "Quality=")
-    if quality is None:
-        return ""
-    quality = quality.split()[0].split("/")
-    quality = matching_line(cell, "Quality=").split()[0].split("/")
-    return str(int(round(float(quality[0]) / float(quality[1]) * 100)))
+# def get_signal_level(cell):
+#     """ Gets the signal level of a network / cell.
+#     @param string cell
+#         A network / cell from iwlist scan.
+#     @return string
+#         The signal level of the network.
+#     """
 
-def get_signal_level(cell):
-    """ Gets the signal level of a network / cell.
-    @param string cell
-        A network / cell from iwlist scan.
+#     signal = matching_line(cell, "signal: ")
+#     if signal is None:
+#       return ""
+#     signal = signal.split(" ")[1]
+#     if len(signal) == 2:
+#         return str(int(round(float(signal[0]) / float(signal[1]) * 100)))
+#     elif len(signal) == 1:
+#         return signal[0].split(' ')[0]
+#     else:
+#         return ""
 
-    @return string
-        The signal level of the network.
-    """
+# def get_noise_level(cell):
+#     """ Gets the noise level of a network / cell.
+#     @param string cell
+#         A network / cell from iwlist scan.
+#     @return string
+#         The noise level of the network.
+#     """
 
-    signal = matching_line(cell, "Signal level=")
-    if signal is None:
-      return ""
-    signal = signal.split("=")[1].split("/")
-    if len(signal) == 2:
-        return str(int(round(float(signal[0]) / float(signal[1]) * 100)))
-    elif len(signal) == 1:
-        return signal[0].split(' ')[0]
-    else:
-        return ""
-
-def get_noise_level(cell):
-    """ Gets the noise level of a network / cell.
-    @param string cell
-        A network / cell from iwlist scan.
-
-    @return string
-        The noise level of the network.
-    """
-
-    noise = matching_line(cell, "Noise level=")
-    if noise is None:
-        return ""
-    noise = noise.split("=")[1]
-    return noise.split(' ')[0]
+#     noise = matching_line(cell, "Noise level=")
+#     if noise is None:
+#         return ""
+#     noise = noise.split("=")[1]
+#     return noise.split(' ')[0]
 
 def get_channel(cell):
     """ Gets the channel of a network / cell.
     @param string cell
         A network / cell from iwlist scan.
-
     @return string
         The channel of the network.
     """
 
-    channel = matching_line(cell, "Channel:")
+    channel = matching_line(cell, "primary channel: ")
     if channel:
-        return channel
-    frequency = matching_line(cell, "Frequency:")
-    channel = re.sub(r".*\(Channel\s(\d{1,3})\).*", r"\1", frequency)
-    return channel
+        channel_number = match(channel,"primary channel: ")
+        return channel_number
+    frequency = matching_line(cell, "freq: ")
+    return frequency
 
-def get_frequency(cell):
-    """ Gets the frequency of a network / cell.
-    @param string cell
-        A network / cell from iwlist scan.
+# def get_frequency(cell):
+#     """ Gets the frequency of a network / cell.
+#     @param string cell
+#         A network / cell from iwlist scan.
+#     @return string
+#         The frequency of the network.
+#     """
 
-    @return string
-        The frequency of the network.
-    """
+#     frequency = matching_line(cell, "freq:")
+#     if frequency is None:
+#         return ""
+#     return frequency.split()[0]
 
-    frequency = matching_line(cell, "Frequency:")
-    if frequency is None:
-        return ""
-    return frequency.split()[0]
+# def get_encryption(cell, emit_version=False):
+#     """ Gets the encryption type of a network / cell.
+#     @param string cell
+#         A network / cell from iwlist scan.
+#     @return string
+#         The encryption type of the network.
+#     """
 
-def get_encryption(cell, emit_version=False):
-    """ Gets the encryption type of a network / cell.
-    @param string cell
-        A network / cell from iwlist scan.
+#     enc = ""
+#     if matching_line(cell, "Encryption key:") == "off":
+#         enc = "Open"
+#     else:
+#         for line in cell:
+#             matching = match(line,"IE:")
+#             if matching == None:
+#                 continue
 
-    @return string
-        The encryption type of the network.
-    """
+#             wpa = match(matching,"WPA")
+#             if wpa == None:
+#                 continue
 
-    enc = ""
-    if matching_line(cell, "Encryption key:") == "off":
-        enc = "Open"
-    else:
-        for line in cell:
-            matching = match(line,"IE:")
-            if matching == None:
-                continue
+#             version_matches = VERSION_RGX.search(wpa)
+#             if len(version_matches.regs) == 1:
+#                 version = version_matches \
+#                     .group(0) \
+#                     .lower() \
+#                     .replace("version", "") \
+#                     .strip()
+#                 wpa = wpa.replace(version_matches.group(0), "").strip()
+#                 if wpa == "":
+#                     wpa = "WPA"
+#                 if emit_version:
+#                     enc = "{0} v.{1}".format(wpa, version)
+#                 else:
+#                     enc = wpa
+#                 if wpa == "WPA2":
+#                     return enc
+#             else:
+#                 enc = wpa
+#         if enc == "":
+#             enc = "WEP"
+#     return enc
 
-            wpa = match(matching,"WPA")
-            if wpa == None:
-                continue
+# def get_mode(cell):
+#     """ Gets the mode of a network / cell.
+#     @param string cell
+#         A network / cell from iwlist scan.
+#     @return string
+#         The IEEE 802.11 mode of the network.
+#     """
 
-            version_matches = VERSION_RGX.search(wpa)
-            if len(version_matches.regs) == 1:
-                version = version_matches \
-                    .group(0) \
-                    .lower() \
-                    .replace("version", "") \
-                    .strip()
-                wpa = wpa.replace(version_matches.group(0), "").strip()
-                if wpa == "":
-                    wpa = "WPA"
-                if emit_version:
-                    enc = "{0} v.{1}".format(wpa, version)
-                else:
-                    enc = wpa
-                if wpa == "WPA2":
-                    return enc
-            else:
-                enc = wpa
-        if enc == "":
-            enc = "WEP"
-    return enc
-
-def get_mode(cell):
-    """ Gets the mode of a network / cell.
-    @param string cell
-        A network / cell from iwlist scan.
-
-    @return string
-        The IEEE 802.11 mode of the network.
-    """
-
-    mode = matching_line(cell, "Extra:ieee_mode=")
-    if mode is None:
-        return ""
-    return mode
+#     mode = matching_line(cell, "Extra:ieee_mode=")
+#     if mode is None:
+#         return ""
+#     return mode
 
 def get_address(cell):
     """ Gets the address of a network / cell.
     @param string cell
         A network / cell from iwlist scan.
-
     @return string
         The address of the network.
     """
+    bss = matching_line(cell, "BSS ")
+    # This contains a trailing "(on wlan0)"
+    # The trailing is removed by splitting the string
+    bss = bss.split("(")[0]
+    return bss
 
-    return matching_line(cell, "Address: ")
+# def get_bit_rates(cell):
+#     """ Gets the bit rate of a network / cell.
+#     @param string cell
+#         A network / cell from iwlist scan.
+#     @return string
+#         The bit rate of the network.
+#     """
 
-def get_bit_rates(cell):
-    """ Gets the bit rate of a network / cell.
-    @param string cell
-        A network / cell from iwlist scan.
+#     return matching_line(cell, "Bit Rates:")
 
-    @return string
-        The bit rate of the network.
-    """
-
-    return matching_line(cell, "Bit Rates:")
-
-# Here you can choose the way of sorting the table. sortby should be a key of
-# the dictionary rules.
+# # Here you can choose the way of sorting the table. sortby should be a key of
+# # the dictionary rules.
 
 def sort_cells(cells):
-    sortby = "Quality"
-    reverse = True
+    sortby = "SSID"
+    reverse = False
     cells.sort(key=lambda el:el[sortby], reverse=reverse)
 
 
-# Below here goes the boring stuff. You shouldn't have to edit anything below
-# this point
+# # Below here goes the boring stuff. You shouldn't have to edit anything below
+# # this point
 
 def matching_line(lines, keyword):
     """ Returns the first matching line in a list of lines.
@@ -230,7 +223,6 @@ def parse_cell(cell, rules):
         A network / cell from iwlist scan.
     @param dictionary rules
         A dictionary of parse rules.
-
     @return dictionary
         parsed networks. """
 
@@ -259,9 +251,9 @@ def print_cells(cells, columns):
     for cell in cells:
         cell_properties = []
         for column in columns:
-            if column == 'Quality':
-                # make print nicer
-                cell[column] = cell[column].rjust(3) + " %"
+            # if column == 'Quality':
+            #     # make print nicer
+            #     cell[column] = cell[column].rjust(3) + " %"
             cell_properties.append(cell[column])
         table.append(cell_properties)
     print_table(table)
@@ -271,7 +263,6 @@ def get_parsed_cells(iw_data, rules=None):
         @param list iw_data
             Output from iwlist scan.
             A list of strings.
-
         @return list
             properties: Name, Address, Quality, Channel, Frequency, Encryption, Signal Level, Noise Level, Bit Rates, Mode.
     """
@@ -280,26 +271,25 @@ def get_parsed_cells(iw_data, rules=None):
     # of each cell. The key will be the name of the column in the table.
     # The value is a function defined above.
     rules = rules or {
-        "Name": get_name,
-        "Quality": get_quality,
+        "SSID": get_name,
+        # "Quality": get_quality,
         "Channel": get_channel,
-        "Frequency": get_frequency,
-        "Encryption": get_encryption,
-        "Address": get_address,
-        "Signal Level": get_signal_level,
-        "Noise Level": get_noise_level,
-        "Bit Rates": get_bit_rates,
-        "Mode": get_mode,
+        # "Frequency": get_frequency,
+        # "Encryption": get_encryption,
+        "BSSID": get_address,
+        # "Signal Level": get_signal_level,
+        # "Noise Level": get_noise_level,
+        # "Bit Rates": get_bit_rates,
+        # "Mode": get_mode,
     }
 
     cells = [[]]
     parsed_cells = []
 
     for line in iw_data:
-        cell_line = match(line, "Cell ")
+        cell_line = match(line, "wlan0")
         if cell_line != None:
             cells.append([])
-            line = cell_line[-27:]
         cells[-1].append(line.rstrip())
 
     cells = cells[1:]
@@ -315,7 +305,6 @@ def call_iwlist(interface='wlan0'):
         @param string interface
             interface to scan
             default is wlan0
-
         @return string
             properties: iwlist output
     """
@@ -326,12 +315,9 @@ def get_interfaces(interface="wlan0"):
         @param string interface
             interface to scan
             default is wlan0
-
         @param list columns
             default data attributes to return
-
         @return dict
             properties: dictionary of iwlist attributes
     """
     return get_parsed_cells(call_iwlist(interface).split('\n'))
-
