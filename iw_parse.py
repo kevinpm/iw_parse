@@ -101,48 +101,20 @@ def get_channel(cell):
 #         return ""
 #     return frequency.split()[0]
 
-# def get_encryption(cell, emit_version=False):
-#     """ Gets the encryption type of a network / cell.
-#     @param string cell
-#         A network / cell from iwlist scan.
-#     @return string
-#         The encryption type of the network.
-#     """
+def get_encryption(cell, emit_version=False):
+    """ Gets the encryption type of a network / cell.
+    @param string cell
+        A network / cell from iwlist scan.
+    @return string
+        The encryption type of the network.
+    """
 
-#     enc = ""
-#     if matching_line(cell, "Encryption key:") == "off":
-#         enc = "Open"
-#     else:
-#         for line in cell:
-#             matching = match(line,"IE:")
-#             if matching == None:
-#                 continue
-
-#             wpa = match(matching,"WPA")
-#             if wpa == None:
-#                 continue
-
-#             version_matches = VERSION_RGX.search(wpa)
-#             if len(version_matches.regs) == 1:
-#                 version = version_matches \
-#                     .group(0) \
-#                     .lower() \
-#                     .replace("version", "") \
-#                     .strip()
-#                 wpa = wpa.replace(version_matches.group(0), "").strip()
-#                 if wpa == "":
-#                     wpa = "WPA"
-#                 if emit_version:
-#                     enc = "{0} v.{1}".format(wpa, version)
-#                 else:
-#                     enc = wpa
-#                 if wpa == "WPA2":
-#                     return enc
-#             else:
-#                 enc = wpa
-#         if enc == "":
-#             enc = "WEP"
-#     return enc
+    enc = matching_line(cell, "Authentication suites: ")
+    if enc is None:
+        enc = "Open"
+    else:
+        enc = match(enc, "Authentication suites: ")
+    return enc
 
 # def get_mode(cell):
 #     """ Gets the mode of a network / cell.
@@ -275,7 +247,7 @@ def get_parsed_cells(iw_data, rules=None):
         # "Quality": get_quality,
         "Channel": get_channel,
         # "Frequency": get_frequency,
-        # "Encryption": get_encryption,
+        "Authentication": get_encryption,
         "BSSID": get_address,
         # "Signal Level": get_signal_level,
         # "Noise Level": get_noise_level,

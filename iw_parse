@@ -16,7 +16,7 @@ def main():
         # "Quality",
         "Channel",
         # "Signal Level",
-        # "Encryption"
+        "Authentication"
     ]
 
     print_cells(parsed_cells, columns)
